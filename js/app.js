@@ -1,7 +1,22 @@
-//get coordinates
-let latitude = 36.1628
+//get longitude and latitude from local storage if possible, if not, set default to cookeville
+let storedLon = localStorage.getItem("longitude");
+let storedLat = localStorage.getItem("latitude");
+
 let longitude = -85.5016
+let latitude = 36.1628
+
+if(storedLon != null){
+    latitude = Number(storedLat)
+    longitude = Number(storedLon)
+}
+
+
+
+
+//initial load of page
 refresh()
+
+//if select changes, set longitude and latitude
 document.querySelector('#selCity').addEventListener('change', ()=>{
     const city = document.querySelector('#selCity').value 
     const divDay = document.querySelector('#divDay')
@@ -10,22 +25,29 @@ document.querySelector('#selCity').addEventListener('change', ()=>{
     divWeek.innerHTML = ``
 
     if(city == "Cookeville"){
-        latitude = 36.1628
-        longitude = -85.5016
+        localStorage.setItem("longitude", -85.5016);
+        localStorage.setItem("latitude", 36.1628);
     }
     if(city == "Clinton"){
-        latitude = 36.1034
-        longitude = -84.1319
+        localStorage.setItem("latitude", 36.1034);
+        localStorage.setItem("longitude", -84.1319);
     }
     if(city == "Atlanta"){
-        latitude = 33.7490
-        longitude = -84.3880
+        localStorage.setItem("latitude", 33.7490);
+        localStorage.setItem("longitude", -84.3880);
     }
+    //refresh the site with the new info
+    longitude = Number(localStorage.getItem("longitude"))
+    latitude = Number(localStorage.getItem("latitude"))
     refresh()
 })
 
+
+
+
 function refresh(){
-    fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max&hourly=cloud_cover,temperature_2m,precipitation_probability&current=is_day,rain,temperature_2m&timezone=America%2FChicago&wind_speed_unit=mph&temperature_unit=fahrenheit&precipitation_unit=inch`)
+
+    fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max&hourly=cloud_cover,temperature_2m,precipitation_probability&current=is_day,rain,weather_code,temperature_2m&timezone=America%2FChicago&wind_speed_unit=mph&temperature_unit=fahrenheit&precipitation_unit=inch`)
     .then(objResponse =>{
         if(!objResponse.ok){
             throw new Error('Bad HTTP response')
@@ -74,10 +96,10 @@ function refresh(){
 
         //set current info
         let isDay = objData.current.is_day
-        let rain = objData.current.rain 
+        let code = objData.current.weather_code
         let currentRain = "Clear"
-        if(rain > 0){
-            currentRain =  `Rain: ${rain}''`
+        if(code > 50 && code < 67){ //all the rain codes are between these two values
+            currentRain =  `Raining`
             if(isDay){
                 imageWeather.src = 'images/RainDay.png'
                 imageWeather.alt = 'Image of a rainy day'
