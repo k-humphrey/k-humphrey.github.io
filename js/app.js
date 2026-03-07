@@ -1,14 +1,22 @@
-//get longitude and latitude from local storage if possible, if not, set default to cookeville
+//get local storage if possible, if not, set default to cookeville
 let storedLon = localStorage.getItem("longitude");
 let storedLat = localStorage.getItem("latitude");
+let storedCity = localStorage.getItem("city");
+
 
 let longitude = -85.5016
 let latitude = 36.1628
+let curCity = 'Cookeville'
 
 if(storedLon != null){
     latitude = Number(storedLat)
     longitude = Number(storedLon)
+   
 }
+if(storedCity != null){
+    curCity = storedCity
+}
+
 
 
 
@@ -16,9 +24,10 @@ if(storedLon != null){
 //initial load of page
 refresh()
 
-//if select changes, set longitude and latitude
+//if select changes, set new values
 document.querySelector('#selCity').addEventListener('change', ()=>{
     const city = document.querySelector('#selCity').value 
+    //reset cards
     const divDay = document.querySelector('#divDay')
     const divWeek = document.querySelector('#divWeek')
     divDay.innerHTML = ``
@@ -27,18 +36,25 @@ document.querySelector('#selCity').addEventListener('change', ()=>{
     if(city == "Cookeville"){
         localStorage.setItem("longitude", -85.5016);
         localStorage.setItem("latitude", 36.1628);
+        localStorage.setItem("city", 'Cookeville');
+
     }
     if(city == "Clinton"){
         localStorage.setItem("latitude", 36.1034);
         localStorage.setItem("longitude", -84.1319);
+        localStorage.setItem("city", 'Clinton');
+
     }
     if(city == "Atlanta"){
         localStorage.setItem("latitude", 33.7490);
         localStorage.setItem("longitude", -84.3880);
+        localStorage.setItem("city", 'Atlanta');
+
     }
     //refresh the site with the new info
     longitude = Number(localStorage.getItem("longitude"))
     latitude = Number(localStorage.getItem("latitude"))
+    curCity = localStorage.getItem("city")
     refresh()
 })
 
@@ -59,6 +75,8 @@ function refresh(){
         const divWeek = document.querySelector('#divWeek')
         const txtCurrentTemp = document.querySelector('#txtCurrentTemp')
         const txtCurrentRain = document.querySelector('#txtCurrentRain')
+        const txtCurrentCity = document.querySelector('#txtCurrentCity')
+
         const imageWeather = document.querySelector('#imageWeather')
 
         //loop through today to fill in div day
@@ -122,6 +140,7 @@ function refresh(){
         let currentTemp = objData.current.temperature_2m
         txtCurrentTemp.innerHTML = `${currentTemp}°`
         txtCurrentRain.innerHTML = `${currentRain}`
+        txtCurrentCity.innerHTML = `${curCity}`
 
     })
 }
